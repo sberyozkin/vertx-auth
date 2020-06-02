@@ -21,7 +21,8 @@ package io.vertx.ext.jwt;
  */
 public final class NoSuchKeyIdException extends RuntimeException {
 
-  private final String id;
+  private final String alg;
+  private final String kid;
 
   public NoSuchKeyIdException(String alg) {
     this(alg, "<null>");
@@ -29,14 +30,30 @@ public final class NoSuchKeyIdException extends RuntimeException {
 
   public NoSuchKeyIdException(String alg, String kid) {
     super("algorithm [" + alg + "]: " + kid);
-    this.id = alg + "#" + kid;
+    this.alg = alg;
+    this.kid = kid;
   }
 
   /**
-   * Returns the missing key with the format {@code ALGORITHM + '#' + KEY_ID}.
-   * @return the id of the missing key
+   * Returns the missing key id in the combined {@code ALGORITHM + '#' + KEY_ID} format.
+   * @return the missing key id in the combined {@code ALGORITHM + '#' + KEY_ID} format.
    */
   public String id() {
-    return id;
+    return alg + "#" + kid;
+  }
+
+  /**
+   * Returns the missing key algorithm.
+   * @return the missing key algorithm
+   */
+  public String algorithm() {
+    return alg;
+  }
+  /**
+   * Returns the missing key identifier.
+   * @return the missing key identifier
+   */
+  public String keyId() {
+    return kid;
   }
 }

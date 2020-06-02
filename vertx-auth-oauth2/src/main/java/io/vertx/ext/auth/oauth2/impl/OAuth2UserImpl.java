@@ -179,18 +179,18 @@ public abstract class OAuth2UserImpl extends AbstractUser implements AccessToken
           return new JsonObject(Buffer.buffer(Base64.getUrlDecoder().decode(payloadSeg)));
         }
       } else {
-        return provider.getJWT().decode(((String) opaque));
-      }
-    } catch (NoSuchKeyIdException e) {
-      Handler<String> handler = provider.missingKeyHandler();
-      if (handler != null) {
-        handler.handle(e.id());
-      } else {
-        // explicity catch and log as debug. exception here is a valid case
-        // the reason is that it can be for several factors, such as bad token
-        // or invalid JWT key setup, in that case we fall back to opaque token
-        // which is the default operational mode for OAuth2.
-        LOG.trace("Cannot decode token:", e);
+        try {
+          return provider.getJWT().decode(((String) opaque));
+        } catch (NoSuchKeyIdException e) {
+          Handler<String> handler = provider.missingKeyHandler();
+          if (handler != null) {
+            handler.handle(e.id());
+            if (provider.getJWT().availableKeyIds(e.algorithm()).contains(e.keyId())) {
+              return provider.getJWT().decode(((String) opaque));
+            }
+          }
+          throw e;
+        }
       }
     } catch (RuntimeException e) {
       // explicity catch and log as debug. exception here is a valid case

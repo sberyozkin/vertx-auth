@@ -423,4 +423,18 @@ public final class JWT {
   public Collection<String> availableAlgorithms() {
     return cryptoMap.keySet();
   }
+
+  public Collection<String> availableKeyIds(String alg) {
+    if (cryptoMap.containsKey(alg)) {
+      Set<String> keyIds = new HashSet<>();
+      for (Crypto c : cryptoMap.get(alg)) {
+        if (c.getId() != null) {
+          keyIds.add(c.getId());
+        }
+      }
+      return keyIds;
+    } else {
+      return Collections.emptySet();
+    }
+  }
 }
